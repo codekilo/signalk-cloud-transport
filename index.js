@@ -5,6 +5,9 @@ const buffersize = 1000;
 const period = 10;
 const paths = ["navigation.speedOverGround", "navigation.position"];
 
+const mqtt = require('mqtt');
+const client = mqtt.connect('mqtt://localhost');
+
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
 var buffer = [];
 ws.on('open', function open() {
@@ -43,6 +46,7 @@ function push() {
     // process the buffer and reset buffer and timer afterwards
     //buffer.forEach(data => console.log(data.updates[0].timestamp));
     console.log(JSON.stringify(buffer, null, 2));
+    client.publish('test', JSON.stringify(buffer, null, 2));
     buffer = [];
     timer = setTimeout(push, period * 1000);
 }
