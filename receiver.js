@@ -8,14 +8,14 @@ client.subscribe('test');
 // const port = '3008';
 // const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
 
-//const uuidv4 = require('uuid/v4');
+// const uuidv4 = require('uuid/v4');
 
 // ws.on('message', function incoming(data) {
 //     console.log(data);
 // });
 const net = require('net');
 const server = new net.Server();
-server.listen(3333, function() {
+server.listen(3333, '0.0.0.0', function() {
     console.log(`Server listening for connection requests on socket localhost: 3333`);
 });
 var sock;
@@ -42,13 +42,14 @@ server.on('connection', function(socket) {
 
 client.on('message', function(topic, message) {
     var data = JSON.parse(message);
-    var res = [];
+    //var res = [];
     if (sock) {
-        data.forEach(update => sock.write(JSON.stringify({
-            "requestID": uuidv4(),
-            "context": update.context,
-            "put": update.updates
-        })));
+        // data.forEach(update => sock.write(JSON.stringify({
+        //     "requestID": uuidv4(),
+        //     "context": update.context,
+        //     "put": update.updates
+        // }) + "\n"));
+        data.forEach(update => sock.write(JSON.stringify(update) + "\n"));
         console.log("put sent");
     }
     //console.log(JSON.stringify(res, null, 2));
