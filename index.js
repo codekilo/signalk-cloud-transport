@@ -1,19 +1,22 @@
+const config = require('config');
 const WebSocket = require('ws');
-const ip = 'localhost';
-const port = '3000';
-const buffersize = 1000;
-const period = 10;
-const paths = ["navigation.speedOverGround", "navigation.position"];
+
+const ip = config.get("ip");
+const port = config.get("port");
+const buffersize = config.get("buffersize");
+const period = config.get("period");
+const paths = require("./config/paths.json");
 
 const mqtt = require('mqtt');
-const client = mqtt.connect('mqtt://localhost');
+const mqttbroker = config.get("mqttbroker");
+const client = mqtt.connect(mqttbroker);
 
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
 var buffer = [];
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
-    var subscribtionPaths = [];
-    paths.forEach(path => subscribtionPaths.push({
+    var subscriptionPaths = [];
+    paths.forEach(path => subscriptionPaths.push({
         "path": path,
         "period": 5000,
         "format": "delta",
@@ -21,7 +24,7 @@ ws.on('open', function open() {
     }));
     var sub = {
         "context": "vessels.self",
-        "subscribe": subscribtionPaths
+        "subscribe": subscriptionPaths
     };
     ws.send(JSON.stringify(sub));
 });

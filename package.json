@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/codekilo/signalk-cloud-transport#readme",
   "dependencies": {
+    "config": "^3.2.4",
     "mqtt": "^3.0.0",
     "uuid": "^3.3.3",
     "ws": "^7.2.0"
