@@ -42,12 +42,22 @@ ws.on('message', function incoming(data) {
 
 });
 
+function callback(err) {
+    if (err) {
+        console.log(err);
+    } else {
+        buffer = [];
+    }
+}
+
 function push() {
     // process the buffer and reset buffer and timer afterwards
     //buffer.forEach(data => console.log(data.updates[0].timestamp));
-    console.log(JSON.stringify(buffer, null, 2));
-    client.publish('test', JSON.stringify(buffer, null, 2));
-    buffer = [];
+    //console.log(JSON.stringify(buffer, null, 2));
+    console.log(buffer.length);
+    client.publish('test', JSON.stringify(buffer, null, 2), {
+        "qos": 2,
+    }, callback);
     timer = setTimeout(push, period * 1000);
 }
 var timer = setTimeout(push, period * 1000);

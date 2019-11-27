@@ -1,6 +1,8 @@
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://localhost');
-client.subscribe('test');
+client.subscribe('test', {
+    "qos": 2
+});
 
 
 // const WebSocket = require('ws');
