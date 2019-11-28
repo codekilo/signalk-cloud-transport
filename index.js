@@ -36,8 +36,6 @@ ws.on('message', function incoming(data) {
     var message = JSON.parse(data);
     // check if the message isn't a hello message
     if (!message.roles) {
-        // console.log(message);
-        // console.log("message received");
         buffer += data + ",";
         if (buffer.length > buffersize) {
             clearTimeout(timer);
@@ -57,8 +55,6 @@ function callback(err) {
 
 function push() {
     // process the buffer and reset buffer and timer afterwards
-    //buffer.forEach(data => console.log(data.updates[0].timestamp));
-    //console.log(JSON.stringify(buffer, null, 2));
     console.log(buffer.length);
     var payload = zlib.gzipSync(buffer.slice(0, buffer.length - 1) + "]");
     console.log(payload.length);

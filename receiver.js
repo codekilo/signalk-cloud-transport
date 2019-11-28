@@ -57,6 +57,5 @@ client.on('message', function(topic, message) {
         data.forEach(update => sock.write(JSON.stringify(update) + "\n"));
         console.log("put sent");
     }
-    //console.log(JSON.stringify(res, null, 2));
     //ws.send(res);
 });
