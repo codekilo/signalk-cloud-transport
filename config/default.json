@@ -1,7 +1,7 @@
 {
 	"ip": "localhost",
 	"port": 3000,
-	"buffersize": 1000,
+	"buffersize": 10000,
 	"period": 10,
 	"mqttbroker": "mqtt://localhost"
 

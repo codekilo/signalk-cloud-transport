@@ -1,5 +1,6 @@
 const config = require('config');
 const WebSocket = require('ws');
+const zlib = require('zlib');
 
 const ip = config.get("ip");
 const port = config.get("port");
@@ -12,7 +13,7 @@ const mqttbroker = config.get("mqttbroker");
 const client = mqtt.connect(mqttbroker);
 
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
-var buffer = [];
+var buffer = "[";
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
     var subscriptionPaths = [];
@@ -20,7 +21,7 @@ ws.on('open', function open() {
         "path": path,
         "period": 5000,
         "format": "delta",
-        "policy": "fixed",
+        "policy": "instant",
     }));
     var sub = {
         "context": "vessels.self",
@@ -36,7 +37,7 @@ ws.on('message', function incoming(data) {
     if (!message.roles) {
         // console.log(message);
         // console.log("message received");
-        buffer.push(message);
+        buffer += data + ",";
         if (buffer.length > buffersize) {
             clearTimeout(timer);
             push();
@@ -49,7 +50,7 @@ function callback(err) {
     if (err) {
         console.log(err);
     } else {
-        buffer = [];
+        buffer = "[";
     }
 }
 
@@ -58,7 +59,9 @@ function push() {
     //buffer.forEach(data => console.log(data.updates[0].timestamp));
     //console.log(JSON.stringify(buffer, null, 2));
     console.log(buffer.length);
-    client.publish('test', JSON.stringify(buffer, null, 2), {
+    var payload = zlib.gzipSync(buffer.slice(0, buffer.length - 1) + "]");
+    console.log(payload.length);
+    client.publish('test', payload, {
         "qos": 2,
     }, callback);
     timer = setTimeout(push, period * 1000);

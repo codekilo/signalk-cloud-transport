@@ -1,4 +1,6 @@
 const mqtt = require('mqtt');
+const zlib = require('zlib');
+
 const client = mqtt.connect('mqtt://localhost');
 client.subscribe('test', {
     "qos": 2
@@ -43,7 +45,8 @@ server.on('connection', function(socket) {
 
 
 client.on('message', function(topic, message) {
-    var data = JSON.parse(message);
+    var payload = zlib.gunzipSync(message);
+    var data = JSON.parse(payload);
     //var res = [];
     if (sock) {
         // data.forEach(update => sock.write(JSON.stringify({
