@@ -15,6 +15,7 @@ const topic = config.get("mqtttopic");
 
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
 var buffer = "[";
+var count = 0;
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
     var subscriptionPaths = [];
@@ -37,6 +38,7 @@ ws.on('message', function incoming(data) {
     // check if the message isn't a hello message
     if (!message.roles) {
         buffer += data + ",";
+        count++;
         if (buffer.length > buffersize) {
             clearTimeout(timer);
             push();
@@ -50,6 +52,7 @@ function callback(err) {
         console.log(err);
     } else {
         buffer = "[";
+        count = 0;
     }
 }
 
@@ -58,6 +61,7 @@ function push() {
     console.log(buffer.length);
     var payload = zlib.gzipSync(buffer.slice(0, buffer.length - 1) + "]");
     console.log(payload.length);
+    console.log(count);
     client.publish(topic, payload, {
         "qos": 2,
     }, callback);
