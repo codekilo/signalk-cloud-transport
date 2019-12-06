@@ -37,7 +37,10 @@ ws.on('message', function incoming(data) {
     var message = JSON.parse(data);
     // check if the message isn't a hello message
     if (!message.roles) {
-        buffer += data + ",";
+        if (count > 0) {
+            buffer += ",";
+        }
+        buffer += data;
         count++;
         if (buffer.length > buffersize) {
             clearTimeout(timer);
@@ -49,7 +52,7 @@ ws.on('message', function incoming(data) {
 
 function callback(err) {
     if (err) {
-        console.log(err);
+        console.log("error: ", err);
     } else {
         buffer = "[";
         count = 0;
@@ -58,10 +61,10 @@ function callback(err) {
 
 function push() {
     // process the buffer and reset buffer and timer afterwards
-    console.log(buffer.length);
-    var payload = zlib.gzipSync(buffer.slice(0, buffer.length - 1) + "]");
-    console.log(payload.length);
-    console.log(count);
+    console.log("buffer", buffer.length);
+    var payload = zlib.gzipSync(buffer + "]");
+    console.log("payload: ", payload.length);
+    console.log("count: ", count);
     client.publish(topic, payload, {
         "qos": 2,
     }, callback);
