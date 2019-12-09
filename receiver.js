@@ -47,7 +47,7 @@ server.on('connection', function(socket) {
 client.on('message', function(topic, message) {
     var payload = zlib.gunzipSync(message);
     var data = JSON.parse(payload);
-    console.log(JSON.stringify(data, null, 2));
+    // console.log(JSON.stringify(data, null, 2));
     //var res = [];
     if (sock) {
         // data.forEach(update => sock.write(JSON.stringify({

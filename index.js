@@ -17,12 +17,12 @@ const client = mqtt.connect(mqttbroker);
 const topic = config.get("mqtttopic");
 
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
-var buffer = "[";
 var count = 0;
 var umcompressed;
 var compressed;
-var m;
-var gzip;
+var m1;
+var m2;
+
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
     var subscriptionPaths = [];
@@ -45,15 +45,13 @@ ws.on('message', function incoming(data) {
     // check if the message isn't a hello message
     if (!message.roles) {
         if (count > 0) {
-            buffer += ",";
             uncompressed.push(',');
         }
-        buffer += data;
         uncompressed.push(data);
         count++;
-        console.log("length: ", m.bytes);
+
         // gzip.flush();
-        if (buffer.length > buffersize) {
+        if (m1.bytes > buffersize) {
             clearTimeout(timer);
             push();
         }
@@ -64,15 +62,11 @@ ws.on('message', function incoming(data) {
 function callback(err) {
     if (err) {
         console.log("error: ", err);
-    } else {
-        buffer = "[";
-        count = 0;
     }
 }
 
-function mqttpublish(data, temp) {
+function mqttpublish(data) {
     console.log("payload: ", data.length);
-    console.log("length2: ", temp.bytes);
     client.publish(topic, data, {
         "qos": 2,
     }, callback);
@@ -82,24 +76,28 @@ function createPipeline(payload) {
     gzip = zlib.createGzip();
     uncompressed = new stream.Readable();
     uncompressed._read = () => {}; // see https://stackoverflow.com/a/22085851
-    compressed = miss.concat(res => mqttpublish(res, m));
-    m = meter();
-    uncompressed.pipe(gzip).pipe(m).pipe(compressed);
+    // create destination and publish when input ends
+    compressed = miss.concat(mqttpublish);
+
+    m1 = meter();
+    m2 = meter();
+    uncompressed.pipe(m1).pipe(gzip).pipe(m2).pipe(compressed);
     uncompressed.push("[");
+    count = 0;
 
 }
 
 function push() {
     // process the buffer and reset buffer and timer afterwards
-    console.log("buffer", buffer.length);
+    // end the input
     uncompressed.push("]");
     uncompressed.push(null);
-    // var payload = zlib.gzipSync(buffer + "]");
-    // console.log("payload: ", payload.length);
+
     console.log("count: ", count);
     createPipeline();
 
     timer = setTimeout(push, period * 1000);
 }
+
 createPipeline();
 var timer = setTimeout(push, period * 1000);
