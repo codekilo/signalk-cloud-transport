@@ -28,7 +28,6 @@ ws.on('open', function open() {
     var subscriptionPaths = [];
     paths.forEach(path => subscriptionPaths.push({
         "path": path,
-        "period": 5000,
         "format": "delta",
         "policy": "instant",
     }));
