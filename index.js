@@ -17,6 +17,11 @@ const client = mqtt.connect(mqttbroker);
 const topic = config.get("mqtttopic");
 
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
+
+const crypto = require('crypto');
+const algorithm = 'aes-192-cbc';
+const key = Buffer.from("abcdefghijklmnopqrstuvwx");
+var cipher;
 var count = 0;
 var umcompressed;
 var compressed;
@@ -64,23 +69,29 @@ function callback(err) {
     }
 }
 
-function mqttpublish(data) {
-    console.log("payload: ", data.length);
-    client.publish(topic, data, {
+function mqttpublish(data, iv) {
+    var payload = Buffer.concat([iv, data]);
+    console.log("payload: ", payload.length);
+    client.publish(topic, payload, {
         "qos": 2,
     }, callback);
 }
 
 function createPipeline(payload) {
+    var iv = crypto.randomBytes(16);
+    // console.log("iv: ", iv);
+    // console.log("key: ", key);
+    cipher = crypto.createCipheriv(algorithm, key, iv);
     gzip = zlib.createGzip();
     uncompressed = new stream.Readable();
     uncompressed._read = () => {}; // see https://stackoverflow.com/a/22085851
     // create destination and publish when input ends
-    compressed = miss.concat(mqttpublish);
+    compressed = miss.concat(data => mqttpublish(data, iv));
 
     m1 = meter();
     m2 = meter();
-    uncompressed.pipe(m1).pipe(gzip).pipe(m2).pipe(compressed);
+
+    uncompressed.pipe(m1).pipe(gzip).pipe(cipher).pipe(m2).pipe(compressed);
     uncompressed.push("[");
     count = 0;
 

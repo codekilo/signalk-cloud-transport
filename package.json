@@ -20,6 +20,7 @@
     "config": "^3.2.4",
     "mississippi": "^4.0.0",
     "mqtt": "^3.0.0",
+    "stream-from-value": "^0.1.0",
     "stream-meter": "^1.0.4",
     "ws": "^7.2.0"
   }
