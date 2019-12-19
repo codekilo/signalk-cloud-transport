@@ -20,7 +20,9 @@ const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscri
 
 const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
-const key = Buffer.from("abcdefghijklmnopqrstuvwx");
+const pw = "abcdefghijklmnopqrstuvwx";
+const salt = crypto.randomBytes(9).toString('base64');
+const key = crypto.scryptSync(pw, salt, 24);
 var cipher;
 var count = 0;
 var umcompressed;
@@ -70,7 +72,7 @@ function callback(err) {
 }
 
 function mqttpublish(data, iv) {
-    var payload = Buffer.concat([iv, data]);
+    var payload = Buffer.concat([iv, Buffer.from(salt), data]);
     console.log("payload: ", payload.length);
     client.publish(topic, payload, {
         "qos": 2,

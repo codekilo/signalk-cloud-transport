@@ -15,7 +15,9 @@ const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscri
 
 const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
-const key = Buffer.from("abcdefghijklmnopqrstuvwx");
+const pw = "abcdefghijklmnopqrstuvwx";
+var salt;
+var key;
 
 ws.on('message', function incoming(data) {
     console.log(data);
@@ -31,9 +33,21 @@ function sendToSignalK(payload) {
 client.on('message', function(topic, message) {
     console.log(message.length);
     var iv = message.slice(0, 16);
+    if (!salt) {
+        salt = message.slice(16, 28);
+        console.log(salt);
+        key = crypto.scryptSync(pw, salt, 24);
+    } else {
+        let tempsalt = message.slice(16, 28);
+        if (!tempsalt.equals(salt)) {
+            console.warn("key changed");
+            salt = tempsalt;
+            key = crypto.scryptSync(pw, salt, 24);
+        }
+    }
     // console.log("iv: ", iv);
     // console.log("key: ", key);
-    var payload = message.slice(16);
+    var payload = message.slice(28);
     var decipher = crypto.createDecipheriv(algorithm, key, iv);
     var decompress = zlib.createGunzip();
     fromValue(payload).pipe(decipher).pipe(decompress).pipe(miss.concat(sendToSignalK));
