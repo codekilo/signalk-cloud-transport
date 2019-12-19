@@ -21,10 +21,9 @@ const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscri
 const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
 const pw = "abcdefghijklmnopqrstuvwx";
+const gkeys = require('./generateKeys.js');
 const salt = crypto.randomBytes(9).toString('base64');
-let keys = generateKeys(pw, salt, 24, 32);
-const key = keys[0];
-const HMACKey = keys[1];
+const keys = gkeys.generateKeys(pw, salt, 24, 32);
 
 var cipher;
 var count = 0;
@@ -33,10 +32,7 @@ var compressed;
 var m1;
 var m2;
 
-function generateKeys(passwd, salt, encryptLength, HMACLength) {
-    var keys = crypto.scryptSync(passwd, salt, encryptLength + HMACLength);
-    return [keys.slice(0, encryptLength), keys.slice(encryptLength)];
-}
+
 
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
@@ -64,7 +60,6 @@ ws.on('message', function incoming(data) {
         uncompressed.push(data);
         count++;
 
-        // gzip.flush();
         if (m1.bytes > buffersize) {
             clearTimeout(timer);
             push();
@@ -80,22 +75,23 @@ function callback(err) {
 }
 
 function mqttpublish(data, iv) {
-    const hmac = crypto.createHmac("sha256", HMACKey);
+    const hmac = crypto.createHmac("sha256", keys.hmac);
     var payload = Buffer.concat([iv, Buffer.from(salt), data]);
     hmac.update(payload);
     var digest = hmac.digest();
     payload = Buffer.concat([digest, payload]);
+
     console.log("payload: ", payload.length);
     client.publish(topic, payload, {
         "qos": 2,
     }, callback);
 }
 
-function createPipeline(payload) {
+function createPipeline() {
     var iv = crypto.randomBytes(16);
     // console.log("iv: ", iv);
     // console.log("key: ", key);
-    cipher = crypto.createCipheriv(algorithm, key, iv);
+    cipher = crypto.createCipheriv(algorithm, keys.encryption, iv);
     gzip = zlib.createGzip();
     uncompressed = new stream.Readable();
     uncompressed._read = () => {}; // see https://stackoverflow.com/a/22085851
