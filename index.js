@@ -22,13 +22,21 @@ const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
 const pw = "abcdefghijklmnopqrstuvwx";
 const salt = crypto.randomBytes(9).toString('base64');
-const key = crypto.scryptSync(pw, salt, 24);
+let keys = generateKeys(pw, salt, 24, 32);
+const key = keys[0];
+const HMACKey = keys[1];
+
 var cipher;
 var count = 0;
 var umcompressed;
 var compressed;
 var m1;
 var m2;
+
+function generateKeys(passwd, salt, encryptLength, HMACLength) {
+    var keys = crypto.scryptSync(passwd, salt, encryptLength + HMACLength);
+    return [keys.slice(0, encryptLength), keys.slice(encryptLength)];
+}
 
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
@@ -72,7 +80,11 @@ function callback(err) {
 }
 
 function mqttpublish(data, iv) {
+    const hmac = crypto.createHmac("sha256", HMACKey);
     var payload = Buffer.concat([iv, Buffer.from(salt), data]);
+    hmac.update(payload);
+    var digest = hmac.digest();
+    payload = Buffer.concat([digest, payload]);
     console.log("payload: ", payload.length);
     client.publish(topic, payload, {
         "qos": 2,
