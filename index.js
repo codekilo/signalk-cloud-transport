@@ -1,9 +1,7 @@
 const config = require('config');
 const WebSocket = require('ws');
-const zlib = require('zlib');
-const stream = require('stream');
-const miss = require('mississippi');
-const meter = require("stream-meter");
+const gkeys = require('./generateKeys.js');
+const pipeLine = require('./createPipleline.js');
 
 const ip = config.get("ip");
 const port = config.get("port");
@@ -19,19 +17,12 @@ const topic = config.get("mqtttopic");
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
 
 const crypto = require('crypto');
-const algorithm = 'aes-192-cbc';
+
 const pw = "abcdefghijklmnopqrstuvwx";
-const gkeys = require('./generateKeys.js');
 const salt = crypto.randomBytes(9).toString('base64');
 const keys = gkeys.generateKeys(pw, salt, 24, 32);
 
-var cipher;
-var count = 0;
-var umcompressed;
-var compressed;
-var m1;
-var m2;
-
+var buffer;
 
 
 ws.on('open', function open() {
@@ -54,13 +45,9 @@ ws.on('message', function incoming(data) {
     var message = JSON.parse(data);
     // check if the message isn't a hello message
     if (!message.roles) {
-        if (count > 0) {
-            uncompressed.push(',');
-        }
-        uncompressed.push(data);
-        count++;
+        buffer.push(data);
 
-        if (m1.bytes > buffersize) {
+        if (buffer.inputLength() > buffersize) {
             clearTimeout(timer);
             push();
         }
@@ -87,37 +74,17 @@ function mqttpublish(data, iv) {
     }, callback);
 }
 
-function createPipeline() {
-    var iv = crypto.randomBytes(16);
-    // console.log("iv: ", iv);
-    // console.log("key: ", key);
-    cipher = crypto.createCipheriv(algorithm, keys.encryption, iv);
-    gzip = zlib.createGzip();
-    uncompressed = new stream.Readable();
-    uncompressed._read = () => {}; // see https://stackoverflow.com/a/22085851
-    // create destination and publish when input ends
-    compressed = miss.concat(data => mqttpublish(data, iv));
-
-    m1 = meter();
-    m2 = meter();
-
-    uncompressed.pipe(m1).pipe(gzip).pipe(cipher).pipe(m2).pipe(compressed);
-    uncompressed.push("[");
-    count = 0;
-
-}
 
 function push() {
     // process the buffer and reset buffer and timer afterwards
     // end the input
-    uncompressed.push("]");
-    uncompressed.push(null);
+    buffer.end();
 
-    console.log("count: ", count);
-    createPipeline();
+    console.log("count: ", buffer.count);
+    buffer = new pipeLine(keys.encryption, mqttpublish);
 
     timer = setTimeout(push, period * 1000);
 }
 
-createPipeline();
+buffer = new pipeLine(keys.encryption, mqttpublish);
 var timer = setTimeout(push, period * 1000);
