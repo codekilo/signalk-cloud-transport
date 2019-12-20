@@ -1,7 +1,7 @@
 const config = require('config');
 const WebSocket = require('ws');
-const generateKeys = require('./generateKeys.js');
-const pipeLine = require('./createPipeline.js');
+const generateKeys = require('./lib/generateKeys.js');
+const pipeLine = require('./lib/createPipeline.js');
 
 const ip = config.get("ip");
 const port = config.get("port");
@@ -23,6 +23,7 @@ const salt = crypto.randomBytes(9).toString('base64');
 const keys = generateKeys(pw, salt, 24, 32);
 
 var buffer;
+var timer;
 
 
 ws.on('open', function open() {
@@ -86,5 +87,9 @@ function push() {
     timer = setTimeout(push, period * 1000);
 }
 
-buffer = new pipeLine(keys.encryption, mqttpublish);
-var timer = setTimeout(push, period * 1000);
+function start() {
+    buffer = new pipeLine(keys.encryption, mqttpublish);
+    timer = setTimeout(push, period * 1000);
+}
+
+start();

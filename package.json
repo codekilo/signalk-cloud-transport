@@ -15,6 +15,10 @@
   "bugs": {
     "url": "https://github.com/codekilo/signalk-cloud-transport/issues"
   },
+  "bin": {
+  "signalk-cloud-tx": "./bin/signalk-cloud-tx",
+    "signalk-cloud-rx": "./bin/signalk-cloud-rx"
+  },
   "homepage": "https://github.com/codekilo/signalk-cloud-transport#readme",
   "dependencies": {
     "config": "^3.2.4",

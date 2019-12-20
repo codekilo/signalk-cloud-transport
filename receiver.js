@@ -2,7 +2,7 @@ const mqtt = require('mqtt');
 const zlib = require('zlib');
 const fromValue = require('stream-from-value');
 const miss = require('mississippi');
-const generateKeys = require('./generateKeys.js');
+const generateKeys = require('./lib/generateKeys.js');
 
 const client = mqtt.connect('mqtt://localhost');
 client.subscribe('test', {
