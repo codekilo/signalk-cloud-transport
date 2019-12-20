@@ -2,7 +2,7 @@ const mqtt = require('mqtt');
 const zlib = require('zlib');
 const fromValue = require('stream-from-value');
 const miss = require('mississippi');
-const gkeys = require('./generateKeys.js');
+const generateKeys = require('./generateKeys.js');
 
 const client = mqtt.connect('mqtt://localhost');
 client.subscribe('test', {
@@ -39,14 +39,14 @@ client.on('message', function(topic, message) {
     var iv = payload.slice(0, 16);
     if (!salt) {
         salt = payload.slice(16, 28);
-        keys = gkeys.generateKeys(pw, salt, 24, 32);
+        keys = generateKeys(pw, salt, 24, 32);
 
     } else {
         let tempsalt = payload.slice(16, 28);
         if (!tempsalt.equals(salt)) {
             console.warn("key changed");
             salt = tempsalt;
-            keys = gkeys.generateKeys(pw, salt, 24, 32);
+            keys = generateKeys(pw, salt, 24, 32);
         }
     }
     const hmac = crypto.createHmac("sha256", keys.hmac);

@@ -1,7 +1,7 @@
 const config = require('config');
 const WebSocket = require('ws');
-const gkeys = require('./generateKeys.js');
-const pipeLine = require('./createPipleline.js');
+const generateKeys = require('./generateKeys.js');
+const pipeLine = require('./createPipeline.js');
 
 const ip = config.get("ip");
 const port = config.get("port");
@@ -20,7 +20,7 @@ const crypto = require('crypto');
 
 const pw = "abcdefghijklmnopqrstuvwx";
 const salt = crypto.randomBytes(9).toString('base64');
-const keys = gkeys.generateKeys(pw, salt, 24, 32);
+const keys = generateKeys(pw, salt, 24, 32);
 
 var buffer;
 

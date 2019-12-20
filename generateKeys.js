@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-exports.generateKeys = function(password, salt, encryptLength, HMACLength) {
+module.exports = function(password, salt, encryptLength, HMACLength) {
 	var keys = crypto.scryptSync(password, salt, encryptLength + HMACLength);
 	return {
 		"encryption": keys.slice(0, encryptLength),
