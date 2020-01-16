@@ -1,19 +1,22 @@
+process.env.NODE_CONFIG_DIR = 'config/receiver/';
+const config = require('config');
 const mqtt = require('mqtt');
 const zlib = require('zlib');
 const fromValue = require('stream-from-value');
 const miss = require('mississippi');
 const generateKeys = require('./lib/generateKeys.js');
 
-const client = mqtt.connect('mqtt://localhost');
-client.subscribe('test', {
+const mqttbroker = config.get("mqttbroker");
+const client = mqtt.connect(mqttbroker);
+const topic = config.get("mqtttopic");
+client.subscribe(topic, {
     "qos": 2
 });
 
 
 const WebSocket = require('ws');
-const ip = 'localhost';
-const port = '3008';
-const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none');
+const ip = config.get('ip');
+const port = config.get('port');
 
 const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
@@ -21,6 +24,13 @@ const pw = "abcdefghijklmnopqrstuvwx";
 var salt;
 var keys;
 
+var token = config.get('token');
+var options = {
+    headers: {
+        "Authorization": "JWT " + token
+    }
+};
+const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none', options);
 ws.on('message', function incoming(data) {
     console.log(data);
 });

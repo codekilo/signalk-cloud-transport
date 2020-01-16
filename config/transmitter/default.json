@@ -5,6 +5,4 @@
 	"period": 10,
 	"mqttbroker": "mqtt://localhost",
 	"mqtttopic": "test"
-
-
 }

@@ -1,3 +1,4 @@
+process.env.NODE_CONFIG_DIR = 'config/transmitter/';
 const config = require('config');
 const WebSocket = require('ws');
 const generateKeys = require('./lib/generateKeys.js');
@@ -7,7 +8,7 @@ const ip = config.get("ip");
 const port = config.get("port");
 const buffersize = config.get("buffersize");
 const period = config.get("period");
-const paths = require("./config/paths.json");
+const paths = require("./config/transmitter/paths.json");
 
 const mqtt = require('mqtt');
 const mqttbroker = config.get("mqttbroker");

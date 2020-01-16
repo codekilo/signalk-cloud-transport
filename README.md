@@ -9,7 +9,7 @@ To install this package clone it from git and run npm install, this needs to hap
 ```
 git clone https://github.com/codekilo/signalk-cloud-transport.git
 cd signalk-cloud-transport
-npm install
+sudo npm  -g install
 ```
 
 ## Use 
