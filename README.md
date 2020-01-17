@@ -15,11 +15,11 @@ sudo npm  -g install
 ## Use 
 
 ### Transmitter
-run `signalk-cloud-tx` 
+run `signalk-cloud-tx` in a directory that also has the `config/` directory
 
 ### Receiver
-run `signalk-cloud-rx` 
+run `signalk-cloud-rx` in a directory that also has the `config/` directory. This config file should contain the token for the websocket connection if required.
 
 ## Configuration
 
-The configuration for the transmitter is in `config/default.json` and `config/paths.json`. The receiver can't be configured right now.
+The configuration for the transmitter is in `config/transmitter/default.json` and `config/transmitter/paths.json`. The configuration for the receiver is located in `config/receiver/default.json`.

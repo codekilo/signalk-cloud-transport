@@ -25,6 +25,7 @@ var salt;
 var keys;
 
 var token = config.get('token');
+// TODO make token optional 
 var options = {
     headers: {
         "Authorization": "JWT " + token

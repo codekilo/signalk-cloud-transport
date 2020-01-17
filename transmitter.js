@@ -9,6 +9,7 @@ const port = config.get("port");
 const buffersize = config.get("buffersize");
 const period = config.get("period");
 const paths = require("./config/transmitter/paths.json");
+const sendothers = config.get("sendothers");
 
 const mqtt = require('mqtt');
 const mqttbroker = config.get("mqttbroker");
@@ -26,7 +27,7 @@ const keys = generateKeys(pw, salt, 24, 32);
 var buffer;
 var timer;
 
-
+let context = sendothers ? "*" : "vessels.self";
 ws.on('open', function open() {
     // subscribe to all signalk paths from configuration
     var subscriptionPaths = [];
@@ -36,7 +37,7 @@ ws.on('open', function open() {
         "policy": "instant",
     }));
     var sub = {
-        "context": "vessels.self",
+        "context": context,
         "subscribe": subscriptionPaths
     };
     ws.send(JSON.stringify(sub));

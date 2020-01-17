@@ -4,5 +4,6 @@
 	"buffersize": 10000,
 	"period": 10,
 	"mqttbroker": "mqtt://localhost",
-	"mqtttopic": "test"
+	"mqtttopic": "test",
+	"sendothers": true
 }
