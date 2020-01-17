@@ -50,7 +50,7 @@ ws.on('message', function incoming(data) {
     if (!message.roles) {
         buffer.push(data);
 
-        if (buffer.inputLength() > buffersize) {
+        if (buffer.outputLength() > buffersize) {
             clearTimeout(timer);
             push();
         }
