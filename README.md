@@ -22,7 +22,7 @@ run `signalk-cloud-rx` in a directory that also has the `config/` directory. Thi
 
 ## Configuration
 
-The configuration for the transmitter is in `config/transmitter/default.json` and `config/transmitter/paths.json`. The configuration for the receiver is located in `config/receiver/default.json`.
+The configuration for the transmitter is in `config/transmitter/default.json`. The configuration for the receiver is located in `config/receiver/default.json`.
 
 ### Shared
 
