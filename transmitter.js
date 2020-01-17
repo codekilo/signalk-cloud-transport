@@ -8,7 +8,7 @@ const ip = config.get("ip");
 const port = config.get("port");
 const buffersize = config.get("buffersize");
 const period = config.get("period");
-const paths = require("./config/transmitter/paths.json");
+const paths = config.get("paths");
 const sendothers = config.get("sendothers");
 
 const mqtt = require('mqtt');

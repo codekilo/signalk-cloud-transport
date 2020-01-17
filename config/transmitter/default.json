@@ -5,5 +5,7 @@
 	"period": 10,
 	"mqttbroker": "mqtt://localhost",
 	"mqtttopic": "test",
-	"sendothers": true
+	"sendothers": true,
+	"paths": ["navigation.speedOverGround", "navigation.position"]
+
 }
