@@ -20,6 +20,8 @@ run `signalk-cloud-tx` in a directory that also has the `config/` directory
 ### Receiver
 run `signalk-cloud-rx` in a directory that also has the `config/` directory. This config file should contain the token for the websocket connection if required.
 
+To generate a token to connect to a signalk server with security enabled see [the signalK specification](https://signalk.org/specification/1.3.0/doc/access_requests.html).
+
 ## Configuration
 
 The configuration for the transmitter is in `config/transmitter/default.json`. The configuration for the receiver is located in `config/receiver/default.json`.
@@ -48,4 +50,4 @@ An array of paths to include in messages, paths can inlcude `*` as wildcard.
 
 ### Receiver
 #### token
-The token used to connect to the signalk server
+The token used to connect to the signalk server (optional)
