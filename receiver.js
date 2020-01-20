@@ -23,14 +23,17 @@ const algorithm = 'aes-192-cbc';
 const pw = "abcdefghijklmnopqrstuvwx";
 var salt;
 var keys;
+var options;
 
-var token = config.get('token');
-// TODO make token optional 
-var options = {
-    headers: {
-        "Authorization": "JWT " + token
-    }
-};
+if (config.has('token')) {
+    let token = config.get('token');
+    options = {
+        headers: {
+            "Authorization": "JWT " + token
+        }
+    };
+}
+
 const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscribe=none', options);
 ws.on('message', function incoming(data) {
     console.log(data);
