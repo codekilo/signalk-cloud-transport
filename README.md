@@ -50,4 +50,4 @@ An array of paths to include in messages, paths can inlcude `*` as wildcard.
 
 ### Receiver
 #### token
-The token used to connect to the signalk server (optional)
+The token used to connect to the signalk server (optional). To generate a token see [the signalk documentation](https://signalk.org/specification/1.3.0/doc/access_requests.html#device-requests).
