@@ -37,6 +37,8 @@ The port of the signalk server
 The mqtt topic the messages will appear on
 #### mqttbroker
 The address of the mqtt broker.
+#### password
+the password to derive the key from.
 
 ### Transmitter
 #### buffersize

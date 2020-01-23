@@ -20,7 +20,7 @@ const port = config.get('port');
 
 const crypto = require('crypto');
 const algorithm = 'aes-192-cbc';
-const pw = "abcdefghijklmnopqrstuvwx";
+const pw = config.get("password");
 var salt;
 var keys;
 var options;
@@ -75,7 +75,24 @@ client.on('message', function(topic, message) {
         var decompress = zlib.createGunzip();
         fromValue(data).pipe(decipher).pipe(decompress).pipe(miss.concat(sendToSignalK));
     } else {
-        console.err("error occured, digests didn't match");
+        console.error("error occured, digests didn't match");
+        let notification = {
+            "context": "vessels.self",
+            "updates": [{
+                "$source": "signalk-cloud-rx",
+                "timestamp": new Date().toISOString(),
+                "values": [{
+                    "path": "notifications.server.transportError",
+                    "value": {
+                        "state": "alert",
+                        "method": [],
+                        "message": "Message could not be decrypted, digests didn't match"
+                    }
+                }]
+
+            }]
+        };
+        ws.send(JSON.stringify(notification));
     }
 
 });

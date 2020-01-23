@@ -20,7 +20,7 @@ const ws = new WebSocket('ws://' + ip + ':' + port + '/signalk/v1/stream?subscri
 
 const crypto = require('crypto');
 
-const pw = "abcdefghijklmnopqrstuvwx";
+const pw = config.get("password");
 const salt = crypto.randomBytes(9).toString('base64');
 const keys = generateKeys(pw, salt, 24, 32);
 
